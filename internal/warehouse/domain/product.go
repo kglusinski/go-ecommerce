@@ -23,6 +23,7 @@ type Product struct {
 }
 
 var (
+	ErrProductNotFound          = errors.New("product not found")
 	ErrInvalidProductParameters = errors.New("invalid product parameters")
 )
 
@@ -38,6 +39,10 @@ func NewProduct(name string, price, amount float64) (*Product, error) {
 		price:  price,
 		amount: amount,
 	}, nil
+}
+
+func (p *Product) ID() uuid.UUID {
+	return p.id
 }
 
 // ChangePrice changes the price of the product. Price cannot be negative.
