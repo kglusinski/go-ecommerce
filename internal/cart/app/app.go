@@ -16,6 +16,7 @@ type Application struct {
 }
 
 type Commands struct {
+	CreateCart     *command.CreateCartHandler
 	AddToCart      *command.AddToCartHandler
 	RemoveFromCart *command.RemoveFromCartHandler
 }
@@ -31,6 +32,7 @@ func NewApplication(repo domain.CartRepository) (*Application, error) {
 
 	return &Application{
 		Commands: Commands{
+			CreateCart:     command.NewCreateCartHandler(repo),
 			AddToCart:      command.NewAddToCartHandler(repo),
 			RemoveFromCart: command.NewRemoveFromCartHandler(repo),
 		},

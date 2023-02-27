@@ -6,10 +6,10 @@ import (
 )
 
 type AddToCart struct {
-	CartID    string
-	ProductID uuid.UUID
-	Amount    float64
-	UnitPrice float64
+	CartID    uuid.UUID `json:"cart_id"`
+	ProductID uuid.UUID `json:"product_id"`
+	Amount    float64   `json:"amount"`
+	UnitPrice float64   `json:"unit_price"`
 }
 
 type AddToCartHandler struct {
@@ -21,5 +21,15 @@ func NewAddToCartHandler(repo domain.CartRepository) *AddToCartHandler {
 }
 
 func (h *AddToCartHandler) Handle(cmd AddToCart) error {
-	return nil
+	cart, err := h.repo.GetCart(cmd.CartID)
+	if err != nil {
+		return err
+	}
+
+	err = cart.AddItem(cmd.ProductID, cmd.Amount, cmd.UnitPrice)
+	if err != nil {
+		return err
+	}
+
+	return h.repo.Save(cart)
 }

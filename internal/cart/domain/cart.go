@@ -1,11 +1,20 @@
 package domain
 
-import "github.com/google/uuid"
+import (
+	"errors"
+
+	"github.com/google/uuid"
+)
+
+var (
+	ErrInsufficientAmount = errors.New("insufficient amount")
+	ErrProductNotFound    = errors.New("product not found")
+)
 
 type Cart struct {
 	id           uuid.UUID
 	userID       uuid.UUID
-	items        []CartItem
+	items        map[uuid.UUID]CartItem
 	discountCode string
 	totalPrice   float64
 	finalPrice   float64
@@ -33,7 +42,7 @@ func (c *Cart) UserID() uuid.UUID {
 	return c.userID
 }
 
-func (c *Cart) Items() []CartItem {
+func (c *Cart) Items() map[uuid.UUID]CartItem {
 	return c.items
 }
 
@@ -50,25 +59,66 @@ func (c *Cart) FinalPrice() float64 {
 }
 
 func (c *Cart) AddItem(productID uuid.UUID, amount, unitPrice float64) error {
-	c.items = append(c.items, CartItem{
+	if c.items == nil {
+		c.items = make(map[uuid.UUID]CartItem, 0)
+	}
+
+	if amount <= 0 {
+		return errors.New("amount must be greater than 0")
+	}
+
+	if unitPrice <= 0 {
+		return errors.New("unit price must be greater than 0")
+	}
+
+	if item, ok := c.items[productID]; ok {
+		item.amount += amount
+		item.sumPrice += amount * unitPrice
+
+		c.items[productID] = item
+		c.totalPrice += amount * unitPrice
+
+		return nil
+	}
+
+	c.items[productID] = CartItem{
 		productID: productID,
 		amount:    amount,
 		unitPrice: unitPrice,
 		sumPrice:  amount * unitPrice,
-	})
+	}
+
 	c.totalPrice += amount * unitPrice
 
 	return nil
 }
 
-func (c *Cart) RemoveItem(productID uuid.UUID) error {
-	for i, item := range c.items {
-		if item.productID == productID {
-			c.items = append(c.items[:i], c.items[i+1:]...)
-			c.totalPrice -= item.sumPrice
-			return nil
-		}
+func (c *Cart) RemoveItem(productID uuid.UUID, amount float64) error {
+	if amount <= 0 {
+		return errors.New("amount must be greater than 0")
 	}
+
+	item, ok := c.items[productID]
+	if !ok {
+		return ErrProductNotFound
+	}
+
+	if item.amount < amount {
+		return ErrInsufficientAmount
+	}
+
+	if item.amount == amount {
+		delete(c.items, productID)
+		c.totalPrice -= amount * item.unitPrice
+
+		return nil
+	}
+
+	item.amount -= amount
+	item.sumPrice -= amount * item.unitPrice
+
+	c.items[productID] = item
+	c.totalPrice -= amount * item.unitPrice
 
 	return nil
 }

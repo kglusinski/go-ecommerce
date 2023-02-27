@@ -17,6 +17,8 @@ func NewCreateCartHandler(repo domain.CartRepository) *CreateCartHandler {
 	return &CreateCartHandler{repo: repo}
 }
 
-func (h *CreateCartHandler) Handle(cmd CreateCart) error {
-	return nil
+func (h *CreateCartHandler) Handle(cmd CreateCart) (uuid.UUID, error) {
+	cart := domain.NewCart(cmd.UserID)
+
+	return cart.ID(), h.repo.Save(cart)
 }

@@ -6,7 +6,9 @@ import (
 )
 
 type RemoveFromCart struct {
-	CartID uuid.UUID
+	CartID    uuid.UUID
+	ProductID uuid.UUID
+	Amount    float64
 }
 
 type RemoveFromCartHandler struct {
@@ -18,5 +20,15 @@ func NewRemoveFromCartHandler(repo domain.CartRepository) *RemoveFromCartHandler
 }
 
 func (h *RemoveFromCartHandler) Handle(cmd RemoveFromCart) error {
-	return nil
+	cart, err := h.repo.GetCart(cmd.CartID)
+	if err != nil {
+		return err
+	}
+
+	err = cart.RemoveItem(cmd.ProductID, cmd.Amount)
+	if err != nil {
+		return err
+	}
+
+	return h.repo.Save(cart)
 }
