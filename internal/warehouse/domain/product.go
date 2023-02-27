@@ -23,6 +23,7 @@ type Product struct {
 }
 
 var (
+	ErrInsufficientAmount       = errors.New("insufficient amount")
 	ErrProductNotFound          = errors.New("product not found")
 	ErrInvalidProductParameters = errors.New("invalid product parameters")
 )
@@ -71,6 +72,10 @@ func (p *Product) Supply(toAdd float64) error {
 func (p *Product) Take(toTake float64) error {
 	if toTake <= 0 {
 		return ErrInvalidProductParameters
+	}
+
+	if p.amount < toTake {
+		return ErrInsufficientAmount
 	}
 
 	p.amount -= toTake
