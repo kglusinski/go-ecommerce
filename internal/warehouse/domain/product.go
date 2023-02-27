@@ -38,6 +38,18 @@ func (p *Product) ID() uuid.UUID {
 	return p.id
 }
 
+func (p *Product) Name() string {
+	return p.name
+}
+
+func (p *Product) Price() float64 {
+	return p.price
+}
+
+func (p *Product) Amount() float64 {
+	return p.amount
+}
+
 // ChangePrice changes the price of the product. Price cannot be negative.
 func (p *Product) ChangePrice(newPrice float64) error {
 	if newPrice <= 0 {

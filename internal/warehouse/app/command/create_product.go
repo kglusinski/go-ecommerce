@@ -3,7 +3,6 @@ package command
 import (
 	"github.com/google/uuid"
 	"github.com/inzkawka/go-ecommerce/internal/warehouse/domain"
-	"github.com/inzkawka/go-ecommerce/internal/warehouse/ports"
 )
 
 type CreateProduct struct {
@@ -13,10 +12,10 @@ type CreateProduct struct {
 }
 
 type CreateProductHandler struct {
-	repo ports.ProductsRepository
+	repo domain.ProductsRepository
 }
 
-func NewCreateProductHandler(repo ports.ProductsRepository) *CreateProductHandler {
+func NewCreateProductHandler(repo domain.ProductsRepository) *CreateProductHandler {
 	return &CreateProductHandler{
 		repo: repo,
 	}

@@ -54,4 +54,5 @@ func mountV1Endpoints(v1 *echo.Group) {
 	productsCtrl := ports.NewProductsController()
 
 	productsV1.POST("", productsCtrl.CreateProduct)
+	productsV1.GET("/:id", productsCtrl.GetProduct)
 }
