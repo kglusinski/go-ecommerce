@@ -2,13 +2,14 @@ package cmd
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"time"
 
-	"github.com/inzkawka/go-ecommerce/internal/warehouse/app"
 	"github.com/inzkawka/go-ecommerce/internal/warehouse/ports"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/gommon/log"
 )
 
 func RunServer() {
@@ -23,13 +24,34 @@ func RunServer() {
 		cancel()
 	}()
 
-	router := ports.NewRouter()
+	e := echo.New()
+	e.Logger.SetLevel(log.INFO)
+	v1 := e.Group("/v1")
+	mountV1Endpoints(v1)
 
-	if err := http.ListenAndServe(":8080", router.Echo); err != nil {
-		log.Fatal("shutting down the server...")
+	// Start server
+	go func() {
+		if err := e.Start(":8080"); err != nil && err != http.ErrServerClosed {
+			e.Logger.Fatal("shutting down the server")
+		}
+	}()
+
+	// Wait for interrupt signal to gracefully shutdown the server with a timeout of 10 seconds.
+	// Use a buffered channel to avoid missing signals as recommended for signal.Notify
+	q := make(chan os.Signal, 1)
+	signal.Notify(q, os.Interrupt)
+	<-q
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := e.Shutdown(ctx); err != nil {
+		e.Logger.Fatal(err)
 	}
 }
 
-func setupApplication() (*app.Application, error) {
-	return app.NewApplication(nil)
+func mountV1Endpoints(v1 *echo.Group) {
+	productsV1 := v1.Group("/products")
+
+	productsCtrl := ports.NewProductsController()
+
+	productsV1.POST("", productsCtrl.CreateProduct)
 }
