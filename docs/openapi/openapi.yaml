@@ -6,7 +6,7 @@ info:
     **Go-ecommerce service**
 
   contact:
-    name: Kamil Glusinski
+    name: Kamil Glusinski <kontakt@inzkawka.pl>
 
 servers:
   - url: http://localhost:8080
@@ -30,6 +30,34 @@ paths:
                     type: string
                     description: "status of the server"
                     example: "ok"
+  "/v1/token":
+    post:
+      operationId: getToken
+      description: "Get user token to access protected endpoints"
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                email:
+                  type: string
+                  description: "user email"
+                password:
+                  type: string
+                  description: "user password"
+        required: true
+      responses:
+        "200":
+          description: "The token has been created"
+          content:
+            application/json:
+              schema:
+                properties:
+                  token:
+                    type: string
+                    description: "user token"
   "/v1/products":
     post:
       operationId: createProduct
