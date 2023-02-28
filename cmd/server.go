@@ -10,6 +10,7 @@ import (
 	cartAdapters "github.com/inzkawka/go-ecommerce/internal/cart/adapters"
 	cartApp "github.com/inzkawka/go-ecommerce/internal/cart/app"
 	cart "github.com/inzkawka/go-ecommerce/internal/cart/ports"
+	"github.com/inzkawka/go-ecommerce/internal/security"
 	warehouse "github.com/inzkawka/go-ecommerce/internal/warehouse/ports"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
@@ -52,22 +53,26 @@ func RunServer() {
 }
 
 func mountV1Endpoints(v1 *echo.Group) {
-	productsV1 := v1.Group("/products")
-
-	productsCtrl := warehouse.NewProductsController()
-
-	productsV1.POST("", productsCtrl.CreateProduct)
-	productsV1.GET("/:id", productsCtrl.GetProduct)
-
-	cartV1 := v1.Group("/cart")
-
 	cartRepo := cartAdapters.NewInMemoryCartRepository()
 	cartApp, err := cartApp.NewApplication(cartRepo)
 	if err != nil {
 		log.Fatal(err)
 	}
+	securitySvc := security.NewSecurityService(nil)
+
+	securityCtrl := security.NewSecurityController(securitySvc)
+	productsCtrl := warehouse.NewProductsController()
 	cartCtrl := cart.NewCartController(cartApp)
 
+	// --- Routes ---
+	securityV1 := v1.Group("/token")
+	securityV1.POST("", securityCtrl.Login)
+
+	productsV1 := v1.Group("/products")
+	productsV1.POST("", productsCtrl.CreateProduct)
+	productsV1.GET("/:id", productsCtrl.GetProduct)
+
+	cartV1 := v1.Group("/cart")
 	cartV1.POST("", cartCtrl.CreateCart)
 	cartV1.GET("/:id", cartCtrl.GetCart)
 	cartV1.POST("/:id/items", cartCtrl.AddToCart)

@@ -7,6 +7,7 @@ require (
 	//github.com/golang-jwt/jwt/v4 v4.4.3
 	//github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.3.0
+	github.com/labstack/echo/v4 v4.10.2
 	//github.com/gorilla/handlers v1.5.1
 	//github.com/gorilla/mux v1.8.0
 	//github.com/jackc/pgx/v5 v5.2.0
@@ -16,11 +17,11 @@ require (
 	//github.com/steinfletcher/apitest v1.5.14
 	//github.com/steinfletcher/apitest-jsonpath v1.7.1
 	github.com/stretchr/testify v1.8.1
-	github.com/labstack/echo/v4 v4.10.2
 )
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect

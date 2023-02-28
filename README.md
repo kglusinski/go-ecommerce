@@ -7,6 +7,9 @@ and [Hexagonal Architecture](https://alistair.cockburn.us/hexagonal-architecture
 ### Non-functional
 - [x] REST API
 - [ ] gRPC API
+- [ ] JWT authentication
+- [ ] Docker
+- [ ] Event sourcing
 ### Functional
 - [x] add product
 - [ ] list products
