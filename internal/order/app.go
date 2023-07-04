@@ -2,6 +2,10 @@ package order
 
 import "github.com/google/uuid"
 
+type AppInterface interface {
+	CreateNewOrder(items []Product) uuid.UUID
+}
+
 type OrderRepository interface {
 	New(order *Order)
 }

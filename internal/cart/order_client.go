@@ -5,21 +5,18 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/google/uuid"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"log"
 	"net/http"
-	url2 "net/url"
+	"net/url"
 )
 
 type HttpOrderClient struct {
 	client http.Client
 }
 
-func NewOrderClient() *HttpOrderClient {
+func NewOrderClient(client http.Client) *HttpOrderClient {
 	return &HttpOrderClient{
-		client: http.Client{
-			Transport: otelhttp.NewTransport(http.DefaultTransport),
-		},
+		client,
 	}
 }
 
@@ -35,8 +32,8 @@ func (c *HttpOrderClient) MakeOrder(ctx context.Context, items []Item) (uuid.UUI
 	log.Println("placed and order")
 
 	reqBody, _ := json.Marshal(MakeOrderRequest{items})
-	url, _ := url2.Parse("http://localhost:8001/v1/orders")
-	req, _ := http.NewRequestWithContext(ctx, http.MethodPost, url.String(), bytes.NewBuffer(reqBody))
+	address, _ := url.Parse("http://localhost:8001/v1/orders")
+	req, _ := http.NewRequestWithContext(ctx, http.MethodPost, address.String(), bytes.NewBuffer(reqBody))
 
 	req.Header.Add("Content-Type", "application/json")
 

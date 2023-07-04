@@ -2,7 +2,9 @@ package main
 
 import (
 	"github.com/getsentry/sentry-go"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"log"
+	"net/http"
 	"time"
 	"tracing_example/internal/cart"
 	"tracing_example/internal/cart/server"
@@ -26,7 +28,11 @@ func main() {
 }
 
 func orchestrateApplication() cart.AppInterface {
-	orderClient := cart.NewOrderClient()
+	httpClient := http.Client{
+		Transport: otelhttp.NewTransport(http.DefaultTransport),
+	}
+
+	orderClient := cart.NewOrderClient(httpClient)
 	tracedOrderClient := trace.NewTracedOrderClient(orderClient)
 	repo := cart.NewInMemoryCartRepository()
 	tracedRepo := trace.NewTracedCartRepository(repo)
