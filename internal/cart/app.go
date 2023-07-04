@@ -5,6 +5,13 @@ import (
 	"github.com/google/uuid"
 )
 
+type AppInterface interface {
+	CreateNewCart(ctx context.Context) uuid.UUID
+	AddItemToCart(ctx context.Context, id uuid.UUID, item Item)
+	GetCartItems(ctx context.Context, id uuid.UUID) *Cart
+	PlaceOrder(ctx context.Context, uid uuid.UUID) (uuid.UUID, error)
+}
+
 type App struct {
 	os   OrderService
 	repo CartRepository
