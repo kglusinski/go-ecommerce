@@ -1,0 +1,15 @@
+version: '3.9'
+
+services:
+  cart_service:
+    build:
+      context: .
+      target: cart_service
+    ports:
+      - '8000:8000'
+  order_service:
+    build:
+      context: .
+      target: order_service
+    ports:
+      - '8001:8001'
